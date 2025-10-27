@@ -3,27 +3,32 @@ import { useLocalStorage } from '@vueuse/core'
 import { v4 as uuidv4 } from 'uuid'
 import type { IAccount } from '@/types/account'
 
-export const useAccountsStore = defineStore('accounts', () => {
-    const accounts = useLocalStorage<IAccount[]>('user-accounts', [])
-
-    function addAccount() {
-        const newAccount: IAccount = {
+const Empty = {
+    get account(): IAccount {
+        return {
             uuid: uuidv4(),
             tags: [],
             type: 'local',
             login: '',
             password: ''
         }
-        accounts.value.push(newAccount)
+    }
+}
+
+export const useAccountsStore = defineStore('accounts', () => {
+    const accounts = useLocalStorage<IAccount[]>('user-accounts', [])
+
+    function addAccount() {
+        accounts.value.push(Empty.account)
     }
 
-    function updateAccount(uuid: string, updates: Partial<IAccount>) {
+    function updateAccount(uuid: IAccount['uuid'], updates: Partial<IAccount>) {
         accounts.value = accounts.value.map(account =>
             account.uuid === uuid ? { ...account, ...updates } : account
         )
     }
 
-    function deleteAccount(uuid: string) {
+    function deleteAccount(uuid: IAccount['uuid']) {
         accounts.value = accounts.value.filter(account => account.uuid !== uuid)
     }
 
