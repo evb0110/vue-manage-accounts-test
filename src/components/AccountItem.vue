@@ -122,6 +122,11 @@ function validatePassword() {
     return isValid
 }
 
+/*
+    Функции сохранения состояния логичнее было бы запускать по нажатию кнопки Save или
+    хотя бы на blur, но поскольку в ТЗ такого нету, сделал real-time update
+*/
+
 function handleTagsInput() {
     store.updateAccount(localAccount.value.uuid, {
         tags: localAccount.value.tags
