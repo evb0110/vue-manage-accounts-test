@@ -16,15 +16,18 @@ const Empty = {
 }
 
 export const useAccountsStore = defineStore('accounts', () => {
+    /*
+        Сейчас сохранение в localStorage идёт на каждом нажатии клавиши, в прод такое пускать нельзя, но в ТЗ нет кнопки сохранения
+    */
     const accounts = useLocalStorage<IAccount[]>('user-accounts', [])
 
     function addAccount() {
         accounts.value.push(Empty.account)
     }
 
-    function updateAccount(uuid: IAccount['uuid'], updates: Partial<IAccount>) {
+    function updateAccount(updatedAccount: IAccount) {
         accounts.value = accounts.value.map(account =>
-            account.uuid === uuid ? { ...account, ...updates } : account
+            account.uuid === updatedAccount.uuid ? updatedAccount : account
         )
     }
 
