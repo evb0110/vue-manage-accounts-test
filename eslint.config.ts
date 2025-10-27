@@ -8,13 +8,32 @@ import pluginVue from 'eslint-plugin-vue'
 // More info at https://github.com/vuejs/eslint-config-typescript/#advanced-setup
 
 export default defineConfigWithVueTs(
-  {
-    name: 'app/files-to-lint',
-    files: ['**/*.{ts,mts,tsx,vue}'],
-  },
+    {
+        name: 'app/files-to-lint',
+        files: ['**/*.{ts,mts,tsx,vue}'],
+    },
 
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
+    globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
 
-  pluginVue.configs['flat/essential'],
-  vueTsConfigs.recommended,
+    pluginVue.configs['flat/essential'],
+    vueTsConfigs.recommended,
+
+    {
+        name: 'app/custom-rules',
+        rules: {
+            'indent': ['error', 4, { SwitchCase: 1 }],
+            'vue/html-indent': ['error', 4, {
+                attribute: 1,
+                baseIndent: 1,
+                closeBracket: 0,
+                alignAttributesVertically: true,
+                ignores: []
+            }],
+            'vue/script-indent': ['error', 4, {
+                baseIndent: 0,
+                switchCase: 1,
+                ignores: []
+            }],
+        },
+    },
 )
