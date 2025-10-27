@@ -1,14 +1,12 @@
 <template>
     <v-app>
-        <v-container>
-            <AccountsManager />
-        </v-container>
+        <AccountsList />
     </v-app>
 </template>
 
 
 <script setup lang="ts">
-import AccountsManager from "@/components/AccountsManager.vue";
+import AccountsList from '@/components/AccountsList.vue'
 </script>
 
 
