@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { useAccountsStore } from '@/stores/accounts'
+import { useAccountsStore } from '@/stores/accountsStore.ts'
 import AccountsHeader from './AccountsHeader.vue'
 import AccountItem from './AccountItem.vue'
 

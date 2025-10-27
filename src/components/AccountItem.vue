@@ -65,9 +65,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useAccountsStore } from '@/stores/accounts'
-import type { IAccount, ITag } from '@/types/account'
+import { ref } from 'vue'
+import { useAccountsStore } from '@/stores/accountsStore.ts'
+import { useTagsString } from '@/composables/useTagsString'
+import { useValidators } from '@/composables/useValidators'
+import type { IAccount } from '@/types/account'
 
 interface IProps {
     account: IAccount
@@ -76,51 +78,20 @@ interface IProps {
 const props = defineProps<IProps>()
 const store = useAccountsStore()
 
+/*
+  Такой подход нереактивен в отношении внешних изменений стора,
+  но в ТЗ об этом ничего не было
+ */
 const localAccount = ref<IAccount>({ ...props.account })
 const showPassword = ref(false)
-const errors = ref({
-    login: false,
-    password: false
-})
 
 const accountTypes = [
     { value: 'local', title: 'Локальная' },
     { value: 'ldap', title: 'LDAP' }
 ]
 
-const tagsString = computed({
-    get: () => localAccount.value.tags.map(tag => tag.text).join('; '),
-    set: (value: string) => {
-        localAccount.value.tags = parseTags(value)
-    }
-})
-
-function parseTags(value: string): ITag[] {
-    if (!value.trim()) return []
-
-    return value
-        .split(';')
-        .map(tag => tag.trim())
-        .filter(tag => tag.length > 0)
-        .map(tag => ({ text: tag }))
-}
-
-function validateLogin() {
-    const isValid = localAccount.value.login.trim().length > 0
-    errors.value.login = !isValid
-    return isValid
-}
-
-function validatePassword() {
-    if (localAccount.value.type === 'ldap') {
-        errors.value.password = false
-        return true
-    }
-
-    const isValid = localAccount.value.password !== null && localAccount.value.password.trim().length > 0
-    errors.value.password = !isValid
-    return isValid
-}
+const tagsString = useTagsString(localAccount)
+const { errors, validateLogin, validatePassword } = useValidators(localAccount)
 
 /*
     Функции сохранения состояния логичнее было бы запускать по нажатию кнопки Save или
@@ -165,9 +136,6 @@ function handleDelete() {
     store.deleteAccount(localAccount.value.uuid)
 }
 
-watch(() => props.account, (newAccount) => {
-    localAccount.value = { ...newAccount }
-}, { deep: true })
 </script>
 
 <style scoped>
