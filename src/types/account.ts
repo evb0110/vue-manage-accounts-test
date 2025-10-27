@@ -5,7 +5,7 @@ export interface ITag {
 export type TAccountType = 'local' | 'ldap'
 
 export interface IAccount {
-    id: string
+    uuid: string
     tags: ITag[]
     type: TAccountType
     login: string
