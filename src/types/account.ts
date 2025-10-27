@@ -2,12 +2,20 @@ export interface ITag {
     text: string
 }
 
-export type TAccountType = 'local' | 'ldap'
-
-export interface IAccount {
+interface IAccountBase {
     uuid: string
     tags: ITag[]
-    type: TAccountType
     login: string
-    password: string | null
 }
+
+export interface IAccountLocal extends IAccountBase {
+    type: 'local'
+    password: string
+}
+
+export interface IAccountLDAP extends IAccountBase {
+    type: 'ldap'
+    password: null
+}
+
+export type IAccount = IAccountLocal | IAccountLDAP

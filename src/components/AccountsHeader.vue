@@ -8,7 +8,7 @@
                 <v-btn
                     variant="outlined"
                     size="large"
-                    @click="handleAdd"
+                    @click="store.addAccount"
                 >
                     <v-icon>mdi-plus</v-icon>
                 </v-btn>
@@ -35,10 +35,6 @@
 import { useAccountsStore } from '@/stores/accountsStore.ts'
 
 const store = useAccountsStore()
-
-function handleAdd() {
-    store.addAccount()
-}
 </script>
 
 <style scoped>

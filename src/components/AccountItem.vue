@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, toRaw } from 'vue'
 import { useAccountsStore } from '@/stores/accountsStore.ts'
 import { useTagsString } from '@/composables/useTagsString'
 import { useValidators } from '@/composables/useValidators'
@@ -79,10 +79,11 @@ const props = defineProps<IProps>()
 const store = useAccountsStore()
 
 /*
-  Такой подход нереактивен в отношении внешних изменений стора,
+  Такой подход нереактивен в отношении внешних изменений стора
+  (например, то же приложение открыто в другой вкладке),
   но в ТЗ об этом ничего не было
  */
-const localAccount = ref<IAccount>({ ...props.account })
+const localAccount = ref<IAccount>(structuredClone(toRaw(props.account)))
 const showPassword = ref(false)
 
 const accountTypes = [
@@ -99,37 +100,39 @@ const { errors, validateLogin, validatePassword } = useValidators(localAccount)
 */
 
 function handleTagsInput() {
-    store.updateAccount(localAccount.value.uuid, {
-        tags: localAccount.value.tags
-    })
+    store.updateAccount(localAccount.value)
 }
 
 function handleTypeChange() {
+    /* Мы здесь теряем сохранённый пароль для другого типа, но в ТЗ об этом ничего нет */
     if (localAccount.value.type === 'ldap') {
-        localAccount.value.password = null
+        localAccount.value = {
+            ...localAccount.value,
+            type: 'ldap',
+            password: null
+        }
         errors.value.password = false
     } else {
-        localAccount.value.password = ''
+        localAccount.value = {
+            ...localAccount.value,
+            type: 'local',
+            password: ''
+        }
     }
 
-    store.updateAccount(localAccount.value.uuid, {
-        type: localAccount.value.type,
-        password: localAccount.value.password
-    })
+    store.updateAccount(localAccount.value)
 }
 
 function handleLoginInput() {
-    validateLogin()
-    store.updateAccount(localAccount.value.uuid, {
-        login: localAccount.value.login
-    })
+    if (validateLogin()) {
+        store.updateAccount(localAccount.value)
+    }
 }
 
 function handlePasswordInput() {
-    validatePassword()
-    store.updateAccount(localAccount.value.uuid, {
-        password: localAccount.value.password
-    })
+    if (validatePassword()) {
+        store.updateAccount(localAccount.value)
+    }
 }
 
 function handleDelete() {
